@@ -1,0 +1,4 @@
+A basic application demonstrating the abilities of local storage.
+
+If your browser supports local storage the messages you submit will persist
+even after page refresh or closure of the browser.

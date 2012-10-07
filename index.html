@@ -1,0 +1,132 @@
+<html>
+
+<head>
+	<title>
+		Local Storage Test
+	</title>
+
+	<script type="text/javascript" src="js/jquery-1.8.2.min.js"></script>
+	<script type="text/javascript" src="js/modernizr_2.6.2.js"></script>
+	<script type="text/javascript" src="js/jquery.json-2.3.min.js"></script>
+
+
+	<script type="text/javascript" src="js/utils.js"></script>
+	<script type="text/javascript" src="js/console.js"></script>
+
+	<link href="css/stylesheet.css" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+	<div id="input_container">
+		<h1>New Message</h1>
+		<hr />
+
+		<input id="input_message" type="text"></input>
+		<button id="button_submit">Submit</button>
+	</div>
+
+	<br />
+
+	<div id="message_history_container">
+		<h1>Message History</h1>
+		<button id="button_clear">Clear Local Storage</button>
+		<hr />
+		<div id="messages">
+		</div>
+	</div>
+
+	<br />
+
+	<div id="console_container">
+		<h1>Console</h1>
+		<hr />
+		<div id="console">
+		</div>
+
+	</div>
+
+	<script type="text/javascript">
+	
+	//an array holding all the messages
+	//if localStorage is supported the 
+	var messages = [];
+
+	function save_message(message)
+	{
+		//add to message array
+		messages.push(message);
+
+		//resave messages to local storage
+		localStorage.messages = $.toJSON(messages);
+	}
+
+	function print_message(message)
+	{
+		//add new message to the history container
+		$("#messages").html("<span>" +  message + "</span><br />" + $("#messages").html());
+	}
+
+	window.onload = function()
+	{
+		//code to create a new message
+		$("#button_submit").click(function(){
+			var message = $("#input_message").val();
+
+			if(message == "")
+			{
+				Console.print("The empty string is not a valid message",Console.ERROR);
+				return;
+			}
+
+			Console.print("New Message: " + message,Console.ALERT);
+
+			save_message(message);
+			print_message(message);
+		});
+
+		//code to clear the localStorage
+		$("#button_clear").click(function(){
+			localStorage.clear();
+			Console.print("Your local storage has been cleared",Console.ALERT);
+		});
+
+		//if local Storage is not supported do not try
+		//to load the messages
+		//in real application if localStorage is not supported
+		//you would fall back to some other form of storage
+		//ex.) cookies
+		if(Modernizr.localStorage == false)
+		{
+			Console.print("Your browser does not support local storage.  Once you refresh the page your messages will not be saved",Console.WARNING);
+		}
+		else
+		{	
+			Console.print("Your browser supports local storage!",Console.ALERT);
+
+			var messages_raw = localStorage.messages;
+
+			if(messages_raw == null)
+			{
+				Console.print("No previous messages found",Console.ALERT);
+			}	
+			else
+			{
+				Console.print("Found previous messages.  The encoded string: '" + messages_raw + "'",Console.ALERT);
+
+				messages = $.evalJSON(messages_raw);
+
+				Console.print("The unencoded messages: '" + messages + "'",Console.ALERT);
+
+				//print the messages that were kept from previous submissions
+				for(var i = 0; i < messages.length; i++)
+				{
+					print_message(messages[i]);
+				}
+			}
+		}
+	}
+
+	</script>
+</body>
+
+</html>
